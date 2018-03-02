@@ -20,7 +20,7 @@ class m180226_134219_mailchimpevent extends Migration
             'data' => $this->text(),
             'status' => $this->smallInteger()->notNull()->defaultValue(10),
             'created_at' => $this->integer()->notNull(),
-            'upd ated_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
         ]);
     }
 

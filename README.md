@@ -4,19 +4,8 @@ Send events to mailchimp ecommerce
 
 do  migrations:
 
-yii migrate --migrationPath=@bh/bh-yii2-mailchimp-ecommerce-event-pusher/migrations/
+php yii migrate --migrationPath=@vendor/breadhead/yii2-mailchimp-ecommerce-event-pusher/src/migrations/
 
-config:
-
-    
-    'components' => [
-        'mailchimpEventPusher' => function () {
-            $store_id = <Your mailchimp store id>;
-            return new \bh\mailchimp\MailchimpEventPusher($store_id);
-        }
-    ]
-    
-    
     
 Implement your model class from MailchimpEventInterface. This ecommerce module for tracking:
 
@@ -50,7 +39,20 @@ Example of realization:
                 ];
             }
 
+   
         
+        
+config:
+
+    
+    'components' => [
+        'mailchimpEventPusher' => function () {
+            $store_id = <Your mailchimp store id>;
+            return new \breadhead\mailchimp\MailchimpEventPusher($store_id);
+        }
+    ]
+    
+    
 
 For sending events:
     

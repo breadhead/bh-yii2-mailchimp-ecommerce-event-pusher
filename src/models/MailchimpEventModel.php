@@ -6,7 +6,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * This is the model class for table "mailchimp_event".
+ * This is the models class for table "mailchimp_event".
  *
  * @property integer $id
  * @property string $entity_id
@@ -20,10 +20,8 @@ use yii\behaviors\TimestampBehavior;
 class MailchimpEventModel extends \yii\db\ActiveRecord
 {
 
-
     const NEW = 10;
-    const PROCESSING = 5;
-    const DONE = 10;
+    const DONE = 0;
 
     /**
      * @inheritdoc

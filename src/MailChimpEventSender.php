@@ -114,7 +114,7 @@ class MailChimpEventSender
     {
         $response = call_user_func_array(array($object, $method), $args);
 
-        \Yii::trace(date('H:i', time()) . '  REQUEST ' . $method . json_encode((array)$args) . "\n" . date('H:i', time()) . '  ANSWER ' . json_encode((array)$answer) . "\n", 'mailchimp');
+        \Yii::trace(date('H:i', time()) . '  REQUEST ' . $method . json_encode((array)$args) . "\n" . date('H:i', time()) . '  ANSWER ' . json_encode((array)$response) . "\n", 'mailchimp');
 
         return $response;
     }
