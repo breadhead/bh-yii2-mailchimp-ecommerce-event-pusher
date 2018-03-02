@@ -6,7 +6,7 @@
  * Time: 17:54
  */
 
-namespace bh\mailchimp;
+namespace breadhed\mailchimp;
 
 /**
  * Interface MailchimpEventInterface

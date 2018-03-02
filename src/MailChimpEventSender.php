@@ -7,13 +7,13 @@
  */
 
 
-namespace bh\mailchimp;
+namespace breadhead\mailchimp;
 
-use app\models\MailchimpEventModel;
-use bh\mailchimp\api\CartsBh;
-use bh\mailchimp\api\CustomerBh;
-use bh\mailchimp\api\OrdersBh;
-use bh\mailchimp\api\ProductsBh;
+use breadhead\mailchimp\models\MailchimpEventModel;
+use breadhead\mailchimp\api\CartsBh;
+use breadhead\mailchimp\api\CustomerBh;
+use breadhead\mailchimp\api\OrdersBh;
+use breadhead\mailchimp\api\ProductsBh;
 use MailChimp\MailChimp;
 use yii\db\ActiveRecord;
 

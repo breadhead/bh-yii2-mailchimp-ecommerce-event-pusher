@@ -6,7 +6,7 @@
  * Time: 17:48
  */
 
-namespace bh\mailchimp;
+namespace breadhead\mailchimp;
 
 use yii\base\Event;
 use yii\db\ActiveRecord;

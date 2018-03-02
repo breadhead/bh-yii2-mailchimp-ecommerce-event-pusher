@@ -1,8 +1,8 @@
 <?php
 
-namespace bh\mailchimp;
-use app\components\db\ModelException;
-use app\models\MailchimpEventModel;
+namespace breadhead\mailchimp;
+
+use breadhead\mailchimp\models\MailchimpEventModel;
 
 /**
  * Class MailchimpEntityEvent

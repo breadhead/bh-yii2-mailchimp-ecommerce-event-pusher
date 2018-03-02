@@ -1,6 +1,6 @@
 <?php
 
-namespace bh\mailchimp\models;
+namespace breadhead\mailchimp\models;
 
 use Yii;
 use yii\behaviors\TimestampBehavior;
