@@ -1,5 +1,5 @@
 {
-    "name": "bh/yii2-mailchimp-ecommerce-event-pusher",
+    "name": "breadhead/yii2-mailchimp-ecommerce-event-pusher",
     "description": "MailChimp Ecommerce Event Pusher for Yii2",
     "keywords"  : [
         "yii2",
