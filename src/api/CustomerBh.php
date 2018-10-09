@@ -1,19 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: kukushkina
- * Date: 01.03.18
- * Time: 19:42
- */
-
 namespace breadhead\mailchimp\api;
 
 use MailChimp\Ecommerce\Customers;
 
 class CustomerBh extends Customers
 {
-    public function createCustomer(string $store_id, array $data)
+    public function createCustomer(string $storeId, array $data)
     {
-        return self::execute("POST", "ecommerce/stores/{$store_id}/orders/", $data);
+        return self::execute("POST", "ecommerce/stores/{$storeId}/customer/", $data);
     }
 }

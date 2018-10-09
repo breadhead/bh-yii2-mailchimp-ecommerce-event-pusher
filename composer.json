@@ -1,25 +1,26 @@
 {
-    "name": "breadhead/yii2-mailchimp-ecommerce-event-pusher",
-    "description": "MailChimp Ecommerce Event Pusher for Yii2",
+    "name": "breadhead/mailchimp-ecommerce-event-pusher",
+    "description": "MailChimp Ecommerce Event Pusher",
     "keywords"  : [
         "yii2",
         "mailchimp",
+        "ecommerce",
         "api",
         "php"
     ],
     "license": "proprietary",
     "require": {
-        "php": ">=5.3.19",
+        "php": ">=7.2",
         "nblakefriend/mailchimp-apiv3": "^1.0"
     },
     "autoload": {
         "psr-4": { "breadhead\\mailchimp\\": "src/" }
     },
-    "homepage": "https://github.com/surzm/bh-yii2-mailchimp-ecommerce-event-pusher.git",
+    "homepage": "https://github.com/breadhead/bh-yii2-mailchimp-ecommerce-event-pusher.git",
     "authors": [
        {
-           "name": "surzm",
-           "email": "mariokyy@breadhead.ru"
+           "name": "Katrin",
+           "email": "katya@breadhead.ru"
        }
    ],
     "minimum-stability": "stable"

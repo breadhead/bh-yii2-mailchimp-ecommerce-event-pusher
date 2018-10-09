@@ -1,30 +1,41 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Katrin
- * Date: 18.12.2017
- * Time: 13:15
- */
-
 namespace breadhead\mailchimp\api;
-
 
 use MailChimp\Ecommerce\Carts;
 
-/**
- * Class CartsBh
- * @package app\modules\mailchimp\components\api
- */
 class CartsBh extends Carts
 {
-    /**
-     * createCart
-     * @param string $store_id
-     * @param array $data
-     * @return mixed
-     */
-    public function createCart(string $store_id, array $data)
+    public function createCart(string $storeId, array $data)
     {
-        return self::execute("POST", "ecommerce/stores/{$store_id}/carts", $data);
+        return self::execute("POST", "ecommerce/stores/{$storeId}/carts", $data);
+    }
+
+    public function updateCart($storeId, $cartId, array $data = [])
+    {
+        $externalCart = $this->getCart($storeId, $cartId);
+
+        if (!$externalCart) {
+            return $this->createCart($storeId, $data);
+        } elseif (count($data['lines']) > 0) {
+            foreach ($externalCart->lines as $line) {
+                $found = false;
+                foreach ($data['lines'] as $item) {
+                    if ($item['id'] == $line->id) {
+                        $found = true;
+                        break;
+                    }
+                }
+
+                if (!$found) {
+                    $this->deleteCartLine($storeId, $cartId, $line->id);
+                }
+            }
+
+            return $this->updateCart($storeId, $cartId, $data);
+
+        } elseif ($externalCart) {
+            return $this->deleteCart($storeId, $cartId);
+
+        }
     }
 }

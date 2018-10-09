@@ -1,25 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Katrin
- * Date: 15.12.2017
- * Time: 17:48
- */
-
 namespace breadhead\mailchimp;
 
 use yii\base\Event;
 use yii\db\ActiveRecord;
 
-/**
- * Class MailchimpEventPusher
- * @package MailchimpEventPusher
- */
 class MailchimpEventPusher
 {
-    private $event_manager;
+    private $eventManager;
 
-    public $store_id;
+    public $storeId;
 
     private $events = [
         ActiveRecord::EVENT_AFTER_INSERT,
@@ -32,63 +21,43 @@ class MailchimpEventPusher
 
     private $logDir = "@runtime/mailchimp_event_pusher/logs";
 
-
-    /**
-     * MailchimpEventPusher constructor.
-     * @param $store_id
-     * @throws \Exception
-     */
-    public function __construct($store_id)
+    public function __construct(string $storeId, MailChimpEventSender $eventSender)
     {
         if (!\Yii::$app->db->getTableSchema($this->mailchimp_events_table)) {
             throw new \Exception('TABLE mailchimp_event DOES`NT EXIST');
         }
 
-        $this->store_id = $store_id;
+        $this->storeId = $storeId;
 
-        $this->event_manager = new MailChimpEventSender($this->store_id);
+        $this->eventManager = $eventSender;
 
-        $this->initLogger()->init();
+        $this->initLogger();
+
+        $this->init();
     }
 
-    /**
-     * @return MailChimpEventSender
-     */
     public function getManager()
     {
-        return $this->event_manager;
+        return $this->eventManager;
     }
 
-    /**
-     * init
-     */
-    private function init()
+    private function init(): void
     {
         $this->setEvents();
-
-        return $this;
     }
 
-    /**
-     * getEvents
-     */
     private function setEvents()
     {
-        foreach ($this->events as $trigger) {
-            Event::on(MailchimpEventInterface::class, $trigger, function ($event) {
-                $event->sender->saveMailchimpEvent($event->name);
+        foreach ($this->events as $eventName) {
+            Event::on(MailchimpEventInterface::class, $eventName, function ($event) {
+                $event->sender->createAndSaveMailchimpEvent($event->name);
             });
         }
 
         return $this;
     }
 
-    /**
-     * init logger to defined directory
-     *
-     * @return $this
-     */
-    private function initLogger()
+    private function initLogger(): void
     {
         $targets = \Yii::$app->getLog()->targets;
 
@@ -100,11 +69,10 @@ class MailchimpEventPusher
                 'yii\db\*', // Don't include messages from db
             ],
         ];
+
         $targets['mailchimp'] = new \yii\log\FileTarget($config);
         \Yii::$app->getLog()->targets = $targets;
         \Yii::$app->getLog()->init();
-
-        return $this;
     }
 
 }

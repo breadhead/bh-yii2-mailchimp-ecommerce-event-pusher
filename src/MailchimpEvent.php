@@ -1,42 +1,41 @@
 <?php
-
 namespace breadhead\mailchimp;
 
 use breadhead\mailchimp\models\MailchimpEventModel;
 
-/**
- * Class MailchimpEntityEvent
- * @package MailchimpEventPusher
- */
 class MailchimpEvent
 {
-
     const CUSTOMER = 'Customer';
     const CART = 'Cart';
     const ORDER = 'Order';
     const PRODUCT = 'Product';
 
-
-    private $entity_id = '';
-    private $entity_type = '';
-    private $event_type = '';
-    private $data = [];
-
     private $model;
 
-
-    public function __construct($id = null)
+    public static function createEmpty()
     {
-        if ($id) {
-            if (!$this->model = MailchimpEventModel::findOne(['id' => $id])) {
-                throw new \Exception('Mailchimp не найден');
-            }
-        } else {
-            $this->model = new MailchimpEventModel();
-        }
+        $model = new MailchimpEventModel();
+
+        return new self($model);
     }
 
-    public function setEntityId(string $id)
+    public static function create(int $id)
+    {
+        $model = MailchimpEventModel::findOne(['id' => $id]);
+
+        if (!$model) {
+            throw new \Exception('MailchimpEvent не найден');
+        }
+
+        return new self($model);
+    }
+
+    private function __construct(MailchimpEventModel $model)
+    {
+        $this->model = $model;
+    }
+
+    public function setEntityId(string $id): self
     {
         $this->model->entity_id = $id;
 
@@ -48,7 +47,7 @@ class MailchimpEvent
         return $this->model->entity_id;
     }
 
-    public function setEntityType(string $type)
+    public function setEntityType(string $type): self
     {
         $this->model->entity_type = $type;
 
@@ -60,7 +59,7 @@ class MailchimpEvent
         return $this->model->entity_type;
     }
 
-    public function setData(array $data)
+    public function setData(array $data): self
     {
         $this->model->data = json_encode($data);
 
@@ -72,19 +71,19 @@ class MailchimpEvent
         return json_decode($this->model->data,true);
     }
 
-    public function getModel()
+    public function getModel(): MailchimpEventModel
     {
         return $this->model;
     }
 
-    public function setStatus(int $status): MailchimpEvent
+    public function setStatus(int $status): self
     {
         $this->model->status = $status;
 
         return $this;
     }
 
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->model->status;
     }
@@ -98,21 +97,14 @@ class MailchimpEvent
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getEventType(): string
     {
         return $this->model->event_type;
     }
 
-    /**
-     * @param string $event_type
-     * @return $this
-     */
-    public function setEventType(string $event_type)
+    public function setEventType(string $eventType): self
     {
-        $this->model->event_type = $event_type;
+        $this->model->event_type = $eventType;
 
         return $this;
     }

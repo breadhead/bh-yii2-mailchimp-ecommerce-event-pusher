@@ -23,9 +23,6 @@ class MailchimpEventModel extends \yii\db\ActiveRecord
     const NEW = 10;
     const DONE = 0;
 
-    /**
-     * @inheritdoc
-     */
     public static function tableName()
     {
         return 'mailchimp_event';
@@ -38,9 +35,6 @@ class MailchimpEventModel extends \yii\db\ActiveRecord
         ];
     }
 
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels()
     {
         return [

@@ -1,41 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Katrin
- * Date: 14.12.2017
- * Time: 15:52
- */
 namespace breadhead\mailchimp\api;
 
 use MailChimp\Ecommerce\Products;
 
-/**
- * Class ProductsBh
- * @package app\components\mailchimp\api
- */
 class ProductsBh extends Products
 {
-    /**
-     * updateProduct
-     * @param $store_id
-     * @param $product_id
-     * @param array $data
-     * @return mixed
-     */
-    public function updateProduct($store_id, $product_id, array $data = [])
+    public function updateProduct($storeId, $productId, array $data = [])
     {
-        return self::execute("PATCH", "ecommerce/stores/{$store_id}/products/{$product_id}", $data);
+        return self::execute("PATCH", "ecommerce/stores/{$storeId}/products/{$productId}", $data);
     }
 
-    /**
-     * addProduct
-     * @param string $store_id
-     * @param array $data
-     * @return mixed|object
-     */
-    public function createProduct($store_id, array $data = [])
+    public function createProduct($storeId, array $data = [])
     {
-        return self::execute("POST", "ecommerce/stores/{$store_id}/products", $data);
+        return self::execute("POST", "ecommerce/stores/{$storeId}/products", $data);
 
     }
 }
