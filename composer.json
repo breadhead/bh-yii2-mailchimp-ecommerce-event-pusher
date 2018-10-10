@@ -1,6 +1,7 @@
 {
     "name": "breadhead/mailchimp-ecommerce-event-pusher",
     "description": "MailChimp Ecommerce Event Pusher",
+    "version": "1.0.0",
     "keywords"  : [
         "yii2",
         "mailchimp",
