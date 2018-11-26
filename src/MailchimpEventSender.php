@@ -27,7 +27,7 @@ class MailchimpEventSender
             'Order' => 'updateOrder'
         ],
         'afterDelete' => [
-            'Customer' => 'deleteCustomer',
+           // 'Customer' => 'deleteMember',
             'Cart' => 'deleteCart',
             'Product' => 'deleteProduct',
             'Order' => 'deleteOrder'
@@ -61,15 +61,17 @@ class MailchimpEventSender
 
     public function sendEvent(MailchimpEvent $event)
     {
-        $response = $this->makeCall(
-            $this->getObject($event->getEntityType()),
-            $this->getEventMethod($event),
-            $this->getData($event)
-        );
+        if ($this->getEventMethod($event)) {
+            $response = $this->makeCall(
+                $this->getObject($event->getEntityType()),
+                $this->getEventMethod($event),
+                $this->getData($event)
+            );
 
-        $event->setStatus(MailchimpEventModel::DONE)->save();
+            $event->setStatus(MailchimpEventModel::DONE)->save();
 
-        $this->checkIfNeedCreate($response, $event);
+            $this->checkIfNeedCreate($response, $event);
+        }
     }
 
     private function makeCall($object, string $method, array $args)
@@ -124,7 +126,7 @@ class MailchimpEventSender
 
     private function getEventMethod(MailchimpEvent $event)
     {
-        return self::$methods[$event->getEventType()][$event->getEntityType()];
+        return isset(self::$methods[$event->getEventType()]) && isset(self::$methods[$event->getEventType()][$event->getEntityType()]) ? self::$methods[$event->getEventType()][$event->getEntityType()] : false;
     }
 
     private function getData(MailchimpEvent $event)
