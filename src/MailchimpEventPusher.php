@@ -50,7 +50,9 @@ class MailchimpEventPusher
     {
         foreach ($this->events as $eventName) {
             Event::on(MailchimpEventInterface::class, $eventName, function ($event) {
-                $event->sender->createAndSaveMailchimpEvent($event->name);
+                if( $event->sender->supportEvent($event->name)) {
+                    $event->sender->createAndSaveMailchimpEvent($event->name);
+                };
             });
         }
 
