@@ -19,8 +19,6 @@ class MailchimpEventPusher
     /* Don`t forget to do migration */
     private $mailchimp_events_table = 'mailchimp_event';
 
-    private $logDir = "@runtime/mailchimp_event_pusher/logs";
-
     public function __construct(string $storeId, MailChimpEventSender $eventSender)
     {
         if (!\Yii::$app->db->getTableSchema($this->mailchimp_events_table)) {
@@ -30,8 +28,6 @@ class MailchimpEventPusher
         $this->storeId = $storeId;
 
         $this->eventManager = $eventSender;
-
-        $this->initLogger();
 
         $this->init();
     }
@@ -58,23 +54,4 @@ class MailchimpEventPusher
 
         return $this;
     }
-
-    private function initLogger(): void
-    {
-        $targets = \Yii::$app->getLog()->targets;
-
-        $config = [
-            'levels' => ['error', 'warning', 'trace', 'info'],
-            'logFile' => \Yii::getAlias($this->logDir). '.log',
-            'logVars' => [],
-            'except' => [
-                'yii\db\*', // Don't include messages from db
-            ],
-        ];
-
-        $targets['mailchimp'] = new \yii\log\FileTarget($config);
-        \Yii::$app->getLog()->targets = $targets;
-        \Yii::$app->getLog()->init();
-    }
-
 }
