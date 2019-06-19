@@ -27,7 +27,7 @@ class MailchimpEventSender
             'Order' => 'updateOrder'
         ],
         'afterDelete' => [
-           // 'Customer' => 'deleteMember',
+            'Customer' => 'deleteCustomer',
             'Cart' => 'deleteCart',
             'Product' => 'deleteProduct',
             'Order' => 'deleteOrder'
@@ -79,23 +79,26 @@ class MailchimpEventSender
         $answer = call_user_func_array(array($object, $method), $args);
 
         $date = date('dmY');
-        $logPath = \yii::$app->basePath . '/logs/mailchimp/' . $date;
-
-        if (!is_dir($logPath)) {
-            mkdir($logPath);
-        }
 
         if ((isset($answer->status) && (int)$answer->status) > 0) {
-            file_put_contents($logPath. '/log_event_fail.log', 'REQUEST '.$method . json_encode((array)$args) . "\n", FILE_APPEND);
-            file_put_contents($logPath.'/log_event_fail.log', 'ANSWER ' . json_encode((array)$answer) . "\n", FILE_APPEND);
+            \Yii::error(
+                'REQUEST '.$method . json_encode((array)$args),
+                'mailchimp'
+            );
+            \Yii::error(
+                'ANSWER ' . json_encode((array)$answer),
+                'mailchimp'
+            );
         } else {
-            file_put_contents($logPath.'/log_event_success.log', 'REQUEST '.$method . json_encode((array)$args) . "\n", FILE_APPEND);
+            \Yii::info(
+                'REQUEST '.$method . json_encode((array)$args),
+                'mailchimp'
+            );
         }
 
         \Yii::trace(date('H:i', time()) . '  REQUEST ' . $method . json_encode((array)$args) . "\n" . date('H:i', time()) . '  ANSWER ' . json_encode((array)$answer) . "\n", 'mailchimp');
 
         return $answer;
-        //return (isset($answer->status) && (int)$answer->status) > 0 ? false : $answer;
     }
 
     private function getObject(string $entity_type)
