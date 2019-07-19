@@ -7,6 +7,6 @@ class CustomerBh extends Customers
 {
     public function createCustomer(string $storeId, array $data)
     {
-        return self::execute("POST", "ecommerce/stores/{$storeId}/customer/", $data);
+        return self::execute("POST", "ecommerce/stores/{$storeId}/customers/", $data);
     }
 }
