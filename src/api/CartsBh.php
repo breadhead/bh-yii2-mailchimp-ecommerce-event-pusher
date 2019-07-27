@@ -5,15 +5,6 @@ use yii\caching\FileCache;
 
 class CartsBh extends EcommerceEntity
 {
-    private $cacheClient;
-
-    public function __construct(MailchimpClient $client, $cacheClient)
-    {
-        parent::__construct($client);
-
-        $this->client = $cacheClient;
-    }
-
     public function createCart(string $storeId, array $data)
     {
         return $this->client->execute("POST", "ecommerce/stores/{$storeId}/carts", $data);
