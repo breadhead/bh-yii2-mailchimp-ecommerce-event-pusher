@@ -1,12 +1,14 @@
 <?php
 namespace breadhead\mailchimp;
 
+use breadhead\mailchimp\api\MailchimpClient;
 use breadhead\mailchimp\models\MailchimpEventModel;
 use breadhead\mailchimp\api\CartsBh;
 use breadhead\mailchimp\api\CustomerBh;
 use breadhead\mailchimp\api\OrdersBh;
 use breadhead\mailchimp\api\ProductsBh;
 use MailChimp\MailChimp;
+use Psr\Http\Message\ResponseInterface;
 use yii\db\ActiveRecord;
 
 class MailchimpEventSender
@@ -33,42 +35,47 @@ class MailchimpEventSender
             'Order' => 'deleteOrder'
         ],
     ];
+    private $client;
 
-    public function __construct(string $storeId)
+    public function __construct(MailchimpClient $client, string $storeId)
     {
+        $this->client = $client;
         $this->storeId = $storeId;
     }
 
     private function getProducts()
     {
-        return new ProductsBh();
+        return new ProductsBh($this->client);
     }
 
     private function getCarts()
     {
-        return new CartsBh();
+        return new CartsBh($this->client);
     }
 
     private function getCustomers()
     {
-        return new CustomerBh();
+        return new CustomerBh($this->client);
     }
 
     private function getOrders()
     {
-        return new OrdersBh();
+        return new OrdersBh($this->client);
     }
 
     public function sendEvent(MailchimpEvent $event)
     {
         if ($this->getEventMethod($event)) {
+            /** @var ResponseInterface $response */
             $response = $this->makeCall(
                 $this->getObject($event->getEntityType()),
                 $this->getEventMethod($event),
                 $this->getData($event)
             );
 
-            $event->setStatus(MailchimpEventModel::DONE)->save();
+            $status = $response->getStatusCode() == 200 ? MailchimpEventModel::DONE : MailchimpEventModel::ERROR;
+
+            $event->setStatus($status)->save();
 
             $this->checkIfNeedCreate($response, $event);
         }
