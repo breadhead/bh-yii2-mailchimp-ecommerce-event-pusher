@@ -83,15 +83,13 @@ class MailchimpClient
         $this->response = json_decode($response->getBody()->getContents());
 
         if ($statusCode <> 200) {
+        /*
+            print_r($url . $method);
+            print_r($data);
+            print_r($this->response);
 
-            if (strstr($this->response->detail, 'provided ID already exists in the account' === false)){
-                print_r($url . $method);
-                print_r($data);
-                print_r($this->response);
-
-                 die('ERROR!!----');
-            }
-
+            die('ERROR!!----');
+        */
         }
 
         return $response;

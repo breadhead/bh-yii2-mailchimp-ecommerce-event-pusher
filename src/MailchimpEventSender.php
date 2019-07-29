@@ -87,7 +87,7 @@ class MailchimpEventSender
 
         $date = date('dmY');
 
-        if ((int)$answer->getStatusCode() > 0) {
+        if ((isset($answer->status) && (int)$answer->status) > 0) {
             \Yii::error(
                 'REQUEST '.$method . json_encode((array)$args),
                 'mailchimp'

@@ -12,6 +12,9 @@ class CartsBh extends EcommerceEntity
 
     public function getCart($storeId, $cartId, array $query = [])
     {
+
+        $answer = $this->client->execute("GET", "ecommerce/stores/{$storeId}/carts/{$cartId}", $query);
+
         $cacheKey = 'carts_' . $storeId . '_' . $cartId;
 
         $obCache = (new FileCache());
@@ -20,10 +23,12 @@ class CartsBh extends EcommerceEntity
         if (!$answer) {
             $answer = $this->client->execute("GET", "ecommerce/stores/{$storeId}/carts/{$cartId}", $query);
 
-            if (!$answer || $answer->status == 404) {
+            if (!$answer || $answer->getStatusCode() == 404) {
                 $obCache->delete($cacheKey);
                 $answer = null;
             } else {
+                $answer = $this->client->getResponse();
+
                 $obCache->add($cacheKey, $answer, 60);
             }
 
@@ -55,7 +60,7 @@ class CartsBh extends EcommerceEntity
                 }
             }
 
-            return parent::patchCart($storeId, $cartId, $data);
+            return $this->patchCart($storeId, $cartId, $data);
 
         } elseif ($externalCart) {
             return $this->deleteCart($storeId, $cartId);
