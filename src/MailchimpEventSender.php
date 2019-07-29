@@ -87,7 +87,7 @@ class MailchimpEventSender
 
         $date = date('dmY');
 
-        if ((isset($answer->status) && (int)$answer->status) > 0) {
+        if ((int)$answer->getStatusCode() > 0) {
             \Yii::error(
                 'REQUEST '.$method . json_encode((array)$args),
                 'mailchimp'
@@ -164,9 +164,8 @@ class MailchimpEventSender
 
     private function checkIfNeedCreate($response, MailchimpEvent $event)
     {
-        if (isset($response->title)
-            && ($event->getEventType() == MailchimpEventModel::EVENT_AFTER_UPDATE)
-            && ($response->status == '404')
+        if ($event->getEventType() == MailchimpEventModel::EVENT_AFTER_UPDATE
+            && ($response->getStatusCode() == '404')
         ) {
             $event->setEventType(ActiveRecord::EVENT_AFTER_INSERT)
                 ->setStatus(MailchimpEventModel::NEW)
