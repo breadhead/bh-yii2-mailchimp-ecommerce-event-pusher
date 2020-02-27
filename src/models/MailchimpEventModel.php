@@ -22,6 +22,7 @@ class MailchimpEventModel extends \yii\db\ActiveRecord
 
     const NEW = 10;
     const DONE = 0;
+    const RUN = 5;
     const ERROR = 7;
 
     public static function tableName()
