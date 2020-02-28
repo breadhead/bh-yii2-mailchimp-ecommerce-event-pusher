@@ -51,10 +51,53 @@ config:
     
     
 
-To send events:
+To send events code example:
+class MailchimpController extends Controller
+{
+    private $maxEventsPerStep;
     
-    $mailchimpEvent = MailchimpEvent::create($event->id);
+    ...
+    
+    public function actionSendevents(): void
+    {
+        $jobs = $this->defineJobs();
+        
+        $this->doJobs($jobs);
+    }
+
+    private function doJobs($jobs): bool
+    {
+        try {
+            $eventSender = \Yii::$app->mailchimpeventpusher->getManager();
+
+            foreach ($jobs as $event) {
+                $event->status = MailchimpEventModel::RUN;
+                Helper::saveAndLogModel($event);
+
+                $mailchimpEvent = MailchimpEvent::create($event->id);
 
                 /* @var MailchimpEventSender $eventSender */
                 $eventSender->sendEvent($mailchimpEvent);
-    \Yii::$app->mailchimpeventpusher->getManager()->sendEvent($event)
+            }
+        } catch (\Exception $e) {
+           
+            throw $e;
+        }
+
+        return true;
+    }
+
+    private function defineJobs(): array
+    {
+        if (MailchimpEventModel::findOne(['status' => MailchimpEventModel::RUN])) {
+            return [];
+        }
+
+        return MailchimpEventModel::find()
+            ->where(['status' => MailchimpEventModel::NEW])
+            ->orderBy(['created_at' => 'ASC'])
+            ->limit($this->maxEventsPerStep)
+            ->all();
+    }
+    ...
+}
