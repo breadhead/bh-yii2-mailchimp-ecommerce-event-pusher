@@ -19,7 +19,6 @@ use yii\behaviors\TimestampBehavior;
  */
 class MailchimpEventModel extends \yii\db\ActiveRecord
 {
-
     const NEW = 10;
     const DONE = 0;
     const RUN = 5;
