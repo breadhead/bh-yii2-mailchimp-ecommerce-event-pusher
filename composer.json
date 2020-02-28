@@ -1,7 +1,7 @@
 {
     "name": "breadhead/mailchimp-ecommerce-event-pusher",
     "description": "MailChimp Ecommerce Event Pusher",
-    "version": "2.5.0",
+    "version": "3.0.0",
     "keywords"  : [
         "yii2",
         "mailchimp",
@@ -20,8 +20,9 @@
     "homepage": "https://github.com/breadhead/bh-yii2-mailchimp-ecommerce-event-pusher.git",
     "authors": [
        {
-           "name": "Katrin",
+           "name": "Katya",
            "email": "katya@breadhead.ru"
        }
-   ]
+   ],
+    "minimum-stability": "stable"
 }
