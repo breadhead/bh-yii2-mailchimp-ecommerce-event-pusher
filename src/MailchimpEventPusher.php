@@ -12,6 +12,7 @@ class MailchimpEventPusher
 
     private $events = [
         ActiveRecord::EVENT_AFTER_INSERT,
+        ActiveRecord::EVENT_BEFORE_UPDATE,
         ActiveRecord::EVENT_AFTER_UPDATE,
         ActiveRecord::EVENT_AFTER_DELETE
     ];

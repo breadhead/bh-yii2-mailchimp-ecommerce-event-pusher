@@ -9,6 +9,7 @@ class MailchimpEvent
     const CART = 'Cart';
     const ORDER = 'Order';
     const PRODUCT = 'Product';
+    const CONCACT = 'Member';
 
     private $model;
 

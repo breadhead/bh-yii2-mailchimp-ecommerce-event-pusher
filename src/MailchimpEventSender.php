@@ -2,11 +2,13 @@
 namespace breadhead\mailchimp;
 
 use breadhead\mailchimp\api\MailchimpClient;
+use breadhead\mailchimp\api\MembersBh;
 use breadhead\mailchimp\models\MailchimpEventModel;
 use breadhead\mailchimp\api\CartsBh;
 use breadhead\mailchimp\api\CustomerBh;
 use breadhead\mailchimp\api\OrdersBh;
 use breadhead\mailchimp\api\ProductsBh;
+use MailChimp\Lists\Members;
 use MailChimp\MailChimp;
 use Psr\Http\Message\ResponseInterface;
 use yii\db\ActiveRecord;
@@ -14,6 +16,8 @@ use yii\db\ActiveRecord;
 class MailchimpEventSender
 {
     private $storeId;
+    private $listId;
+    private $client;
 
     private static $methods = [
         'afterInsert' => [
@@ -26,21 +30,23 @@ class MailchimpEventSender
             'Customer' => 'upsertCustomer',
             'Cart' => 'updateCart',
             'Product' => 'updateProduct',
-            'Order' => 'updateOrder'
+            'Order' => 'updateOrder',
+            'Member' => 'updateMember'
         ],
         'afterDelete' => [
             'Customer' => 'deleteCustomer',
             'Cart' => 'deleteCart',
             'Product' => 'deleteProduct',
-            'Order' => 'deleteOrder'
+            'Order' => 'deleteOrder',
+            'Member' => 'deleteMemberPermanently'
         ],
     ];
-    private $client;
 
-    public function __construct(MailchimpClient $client, string $storeId)
+    public function __construct(MailchimpClient $client, string $storeId, string $listId)
     {
         $this->client = $client;
         $this->storeId = $storeId;
+        $this->listId = $listId;
     }
 
     private function getProducts()
@@ -58,6 +64,11 @@ class MailchimpEventSender
         return new CustomerBh($this->client);
     }
 
+    private function getMembers()
+    {
+        return new MembersBh($this->client);
+    }
+    
     private function getOrders()
     {
         return new OrdersBh($this->client);
@@ -73,7 +84,7 @@ class MailchimpEventSender
                 $this->getData($event)
             );
 
-            $status = $response->getStatusCode() == 200 ? MailchimpEventModel::DONE : MailchimpEventModel::ERROR;
+            $status = $response->getStatusCode() == 200 || $response->getStatusCode() == 204 ? MailchimpEventModel::DONE : MailchimpEventModel::ERROR;
 
             $event->setStatus($status)->save();
 
@@ -81,7 +92,7 @@ class MailchimpEventSender
         }
     }
 
-    private function makeCall($object, string $method, array $args)
+    private function makeCall($object, string $method, array $args): ResponseInterface
     {
         $answer = call_user_func_array(array($object, $method), $args);
 
@@ -108,9 +119,9 @@ class MailchimpEventSender
         return $answer;
     }
 
-    private function getObject(string $entity_type)
+    private function getObject(string $entityType)
     {
-        switch ($entity_type) {
+        switch ($entityType) {
             case MailchimpEvent::ORDER:
                 $object = $this->getOrders();
 
@@ -127,8 +138,13 @@ class MailchimpEventSender
                 $object = $this->getProducts();
 
                 break;
+
+            case MailchimpEvent::CONCACT:
+                $object = $this->getMembers();
+
+                break;
             default:
-                throw new \InvalidArgumentException('Unexpected entity_type');
+                throw new \InvalidArgumentException('Unexpected entityType');
         }
 
         return $object;
@@ -136,27 +152,39 @@ class MailchimpEventSender
 
     private function getEventMethod(MailchimpEvent $event)
     {
-        return isset(self::$methods[$event->getEventType()]) && isset(self::$methods[$event->getEventType()][$event->getEntityType()]) ? self::$methods[$event->getEventType()][$event->getEntityType()] : false;
+        return
+            isset(self::$methods[$event->getEventType()]) &&
+            isset(self::$methods[$event->getEventType()][$event->getEntityType()]) ?
+                self::$methods[$event->getEventType()][$event->getEntityType()] :
+                false;
     }
 
     private function getData(MailchimpEvent $event)
     {
-        $data = [$this->storeId];
+        if ($event->getEntityType() == MailchimpEvent::CONCACT) {
+            $data = [$this->listId, $event->getData()['email_address']];
 
-        switch ($event->getEventType()) {
-            case ActiveRecord::EVENT_AFTER_DELETE:
-                $data[] = $event->getEntityId();
-
-                break;
-            case ActiveRecord::EVENT_AFTER_UPDATE:
-                $data[] = $event->getEntityId();
+            if ($event->getEventType() != ActiveRecord::EVENT_AFTER_DELETE) {
                 $data[] = $event->getData();
+            }
+        } else {
+            $data = [$this->storeId];
 
-                break;
-            case ActiveRecord::EVENT_AFTER_INSERT:
-                $data[] = $event->getData();
+            switch ($event->getEventType()) {
+                case ActiveRecord::EVENT_AFTER_DELETE:
+                    $data[] = $event->getEntityId();
 
-                break;
+                    break;
+                case ActiveRecord::EVENT_AFTER_UPDATE:
+                    $data[] = $event->getEntityId();
+                    $data[] = $event->getData();
+
+                    break;
+                case ActiveRecord::EVENT_AFTER_INSERT:
+                    $data[] = $event->getData();
+
+                    break;
+            }
         }
 
         return $data;
@@ -165,7 +193,8 @@ class MailchimpEventSender
     private function checkIfNeedCreate($response, MailchimpEvent $event)
     {
         if ($event->getEventType() == MailchimpEventModel::EVENT_AFTER_UPDATE
-            && ($response->getStatusCode() == '404')
+            && ($response->getStatusCode() == '404'
+            && $event->getEntityType() != MailchimpEvent::CONCACT)
         ) {
             $event->setEventType(ActiveRecord::EVENT_AFTER_INSERT)
                 ->setStatus(MailchimpEventModel::NEW)
